@@ -8,15 +8,33 @@
   - Test long-running tasks (ultra)
   - Test auto deep research
   - Test with custom JSON schema
-- Confirm everything is according to guidelines https://docs.n8n.io/integrations/creating-nodes/build/reference/verification-guidelines/
+- Get access to publish package
 - Publish package `n8n-nodes-parallel`
 - Test in hosted environment
   - long running tasks work?
   - everything smooth
   - test with users familiar with n8n
+- Confirm everything is according to guidelines
+  - https://docs.n8n.io/integrations/creating-nodes/build/reference/verification-guidelines/
+  - https://docs.n8n.io/integrations/creating-nodes/deploy/submit-community-nodes
+  - Make sure the linter passes (in other words, make sure running npx @n8n/scan-community-package n8n-nodes-PACKAGE passes).
+- Submit community node and get vetted / make it official with n8n
 - Create blogpost / thread about n8n integration?
+- Popularize the integration
+  - with n8n influencers: work with M., J. to deploy it into the community?
+  - get it featured by n8n
 
 # Potential areas of improvement
+
+## How to reduce TTFI (time to first integration)
+
+- oauth
+- simplify i/o
+- remove points people could get confused
+
+## to MCP or not to MCP?
+
+- MCP tools are potentially very powerful, but hard to really setup within n8n. Not allowing MCPs reduces capability of our product, but there's too much friction to add it and no easy way to test, likely resulting in frustration with low-coders
 
 ## Chat completions
 
