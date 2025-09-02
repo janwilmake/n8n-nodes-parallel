@@ -1,0 +1,9 @@
+- ✅ Make n8n node https://docs.n8n.io/integrations/creating-nodes/deploy/submit-community-nodes/
+- ✅ Initial draft spec: https://letmeprompt.com/rules-httpsuithu-wwlvvv0
+- Test this node within the n8n interface and see if it works as expected
+  - Is task timeout ok? Is up to an hour possible?
+  - Is ux ok? how can we instruct people better, refer to docs etc, from UI?
+  - What evidence is there that OAuth is desired for n8n?
+- Improve quirks
+- Authentication is hard! Seems possible though, see for example https://github.com/n8n-io/n8n/blob/master/packages/nodes-base/credentials/BoxOAuth2Api.credentials.ts. Let's ask Maurice about oauth friction, and possibly contact n8n to ask what's required to do an oauth2 flow.
+- Add `/chat/completions` with text output
