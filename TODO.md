@@ -8,6 +8,7 @@
   - Test long-running tasks (ultra)
   - Test auto deep research
   - Test with custom JSON schema
+- Confirm everything is according to guidelines https://docs.n8n.io/integrations/creating-nodes/build/reference/verification-guidelines/
 - Publish package `n8n-nodes-parallel`
 - Test in hosted environment
   - long running tasks work?
