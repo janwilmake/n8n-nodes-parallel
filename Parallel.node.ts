@@ -108,6 +108,36 @@ export class Parallel implements INodeType {
 				description: 'Input to the task, either text or a JSON object',
 			},
 			{
+				displayName: 'Output Schema Type',
+				name: 'outputSchemaType',
+				type: 'options',
+				required: true,
+				displayOptions: {
+					show: {
+						resource: ['task'],
+						operation: ['execute'],
+					},
+				},
+				options: [
+					{
+						name: 'Auto',
+						value: 'auto',
+						description: 'Automatically determine output schema',
+					},
+					{
+						name: 'Text',
+						value: 'text',
+						description: 'Text description of desired output',
+					},
+					{
+						name: 'JSON',
+						value: 'json',
+						description: 'Structured JSON schema',
+					},
+				],
+				default: 'text',
+			},
+			{
 				displayName: 'Output Description',
 				name: 'outputDescription',
 				type: 'string',
@@ -116,16 +146,38 @@ export class Parallel implements INodeType {
 					show: {
 						resource: ['task'],
 						operation: ['execute'],
+						outputSchemaType: ['text'],
 					},
 				},
 				default: '',
 				placeholder: 'GDP in USD for the year, formatted like "$3.1 trillion (2023)"',
-				description: 'Description of the desired output from the task',
+				description: 'Text description of the desired output from the task',
+			},
+			{
+				displayName: 'JSON Schema',
+				name: 'jsonSchema',
+				type: 'json',
+				typeOptions: {
+					rows: 10,
+				},
+				required: true,
+				displayOptions: {
+					show: {
+						resource: ['task'],
+						operation: ['execute'],
+						outputSchemaType: ['json'],
+					},
+				},
+				default:
+					'{\n  "type": "object",\n  "properties": {\n    "result": {\n      "type": "string",\n      "description": "The main result"\n    }\n  },\n  "required": ["result"],\n  "additionalProperties": false\n}',
+				description: 'JSON schema defining the structure of the expected output',
 			},
 			{
 				displayName: 'Processor',
 				name: 'processor',
 				type: 'options',
+				description:
+					'Processor used for the task. When choosing pro or above, ensure your workflow timeout is sufficient. Ultra tasks may take up to 30 minutes.',
 				displayOptions: {
 					show: {
 						resource: ['task'],
@@ -190,11 +242,11 @@ export class Parallel implements INodeType {
 				default: {},
 				options: [
 					{
-						displayName: 'Output Schema',
-						name: 'outputSchema',
-						type: 'json',
+						displayName: 'Input Schema',
+						name: 'inputSchema',
+						type: 'string',
 						default: '',
-						description: 'JSON schema defining the structure of the expected output',
+						description: 'Optional description of expected input to the task',
 					},
 					{
 						displayName: 'Metadata',
@@ -249,7 +301,7 @@ export class Parallel implements INodeType {
 				displayName: 'Objective',
 				name: 'objective',
 				type: 'string',
-				required: true,
+				required: false,
 				displayOptions: {
 					show: {
 						resource: ['search'],
@@ -348,7 +400,7 @@ export class Parallel implements INodeType {
 		],
 	};
 
-	async execute(this: IExecuteFunctions & Parallel): Promise<INodeExecutionData[][]> {
+	async execute(this: IExecuteFunctions): Promise<INodeExecutionData[][]> {
 		const items = this.getInputData();
 		const returnData: IDataObject[] = [];
 		const resource = this.getNodeParameter('resource', 0) as string;
@@ -358,12 +410,12 @@ export class Parallel implements INodeType {
 			try {
 				if (resource === 'task') {
 					if (operation === 'execute') {
-						const result = await this.executeTask(i);
+						const result = await executeTask(this, i);
 						returnData.push(result);
 					}
 				} else if (resource === 'search') {
 					if (operation === 'search') {
-						const result = await this.executeSearch(i);
+						const result = await executeSearch(this, i);
 						returnData.push(result);
 					}
 				}
@@ -384,214 +436,239 @@ export class Parallel implements INodeType {
 
 		return [this.helpers.returnJsonArray(returnData)];
 	}
+}
 
-	private async executeTask(
-		this: IExecuteFunctions & Parallel,
-		itemIndex: number,
-	): Promise<IDataObject> {
-		const input = this.getNodeParameter('input', itemIndex) as string;
-		const outputDescription = this.getNodeParameter('outputDescription', itemIndex) as string;
-		const processor = this.getNodeParameter('processor', itemIndex) as string;
-		const additionalFields = this.getNodeParameter(
-			'additionalFields',
+async function executeTask(
+	executeFunctions: IExecuteFunctions,
+	itemIndex: number,
+): Promise<IDataObject> {
+	const input = executeFunctions.getNodeParameter('input', itemIndex) as string;
+	const outputSchemaType = executeFunctions.getNodeParameter(
+		'outputSchemaType',
+		itemIndex,
+	) as string;
+	const processor = executeFunctions.getNodeParameter('processor', itemIndex) as string;
+	const additionalFields = executeFunctions.getNodeParameter(
+		'additionalFields',
+		itemIndex,
+		{},
+	) as IDataObject;
+
+	// Prepare task specification
+	const taskSpec: IDataObject = {};
+
+	// Build output schema based on type
+	if (outputSchemaType === 'auto') {
+		taskSpec.output_schema = {
+			type: 'auto',
+		};
+	} else if (outputSchemaType === 'text') {
+		const outputDescription = executeFunctions.getNodeParameter(
+			'outputDescription',
 			itemIndex,
-			{},
-		) as IDataObject;
-
-		// Prepare task specification
-		const taskSpec: IDataObject = {
-			output_schema: outputDescription,
+		) as string;
+		taskSpec.output_schema = {
+			type: 'text',
+			description: outputDescription,
 		};
-
-		// Add custom output schema if provided
-		if (additionalFields.outputSchema) {
-			try {
-				const customSchema = JSON.parse(additionalFields.outputSchema as string);
-				taskSpec.output_schema = {
-					type: 'json',
-					json_schema: customSchema,
-				};
-			} catch (error) {
-				throw new NodeOperationError(
-					this.getNode(),
-					`Invalid JSON in output schema: ${error.message}`,
-					{ itemIndex },
-				);
-			}
-		}
-
-		// Prepare request body
-		const body: IDataObject = {
-			input: this.tryParseJSON(input),
-			processor,
-			task_spec: taskSpec,
-		};
-
-		// Add metadata if provided
-		if (
-			additionalFields.metadata &&
-			Array.isArray((additionalFields.metadata as IDataObject).metadataFields)
-		) {
-			const metadata: IDataObject = {};
-			const metadataFields = (additionalFields.metadata as IDataObject)
-				.metadataFields as IDataObject[];
-			for (const field of metadataFields) {
-				if (field.key && field.value) {
-					metadata[field.key as string] = field.value;
-				}
-			}
-			if (Object.keys(metadata).length > 0) {
-				body.metadata = metadata;
-			}
-		}
-
-		// Add source policy if provided
-		const sourcePolicy = this.buildSourcePolicy(additionalFields);
-		if (sourcePolicy) {
-			body.source_policy = sourcePolicy;
-		}
-
-		// Create task run
-		const taskRun = await this.parallelApiRequest('POST', '/v1/tasks/runs', body);
-		const runId = taskRun.run_id;
-
-		// Poll for result with increasing timeout and retry logic
-		const maxAttempts = 8; // More than 7 to get over an hour total
-		let attempt = 0;
-
-		while (attempt < maxAttempts) {
-			try {
-				const timeout = 570;
-				const result = await this.parallelApiRequest(
-					'GET',
-					`/v1/tasks/runs/${runId}/result?timeout=${timeout}`,
-				);
-
-				// Flatten the result for easier use in n8n
-				return getFlatResult(result);
-			} catch (error) {
-				attempt++;
-
-				// If it's a timeout error and we haven't exceeded max attempts, continue
-				if (error.httpCode === '408' && attempt < maxAttempts) {
-					continue;
-				}
-
-				// For other errors or if we've exceeded max attempts, throw
-				throw error;
-			}
-		}
-
-		throw new NodeOperationError(
-			this.getNode(),
-			`Task execution timed out after ${maxAttempts} attempts (approximately ${maxAttempts * 10} minutes)`,
-			{ itemIndex },
-		);
-	}
-
-	private async executeSearch(
-		this: IExecuteFunctions & Parallel,
-		itemIndex: number,
-	): Promise<IDataObject> {
-		const objective = this.getNodeParameter('objective', itemIndex) as string;
-		const processor = this.getNodeParameter('searchProcessor', itemIndex) as string;
-		const additionalFields = this.getNodeParameter(
-			'searchAdditionalFields',
-			itemIndex,
-			{},
-		) as IDataObject;
-
-		// Prepare request body
-		const body: IDataObject = {
-			objective,
-			processor,
-		};
-
-		// Add search queries if provided
-		if (additionalFields.searchQueries) {
-			const queries = (additionalFields.searchQueries as string)
-				.split(',')
-				.map((q) => q.trim())
-				.filter((q) => q.length > 0);
-			if (queries.length > 0) {
-				body.search_queries = queries;
-			}
-		}
-
-		// Add other optional fields
-		if (additionalFields.maxResults) {
-			body.max_results = additionalFields.maxResults;
-		}
-		if (additionalFields.maxCharsPerResult) {
-			body.max_chars_per_result = additionalFields.maxCharsPerResult;
-		}
-
-		// Add source policy if provided
-		const sourcePolicy = this.buildSourcePolicy(additionalFields);
-		if (sourcePolicy) {
-			body.source_policy = sourcePolicy;
-		}
-
-		return await this.parallelApiRequest('POST', '/v1beta/search', body);
-	}
-
-	private buildSourcePolicy(additionalFields: IDataObject): IDataObject | null {
-		const sourcePolicy: IDataObject = {};
-
-		if (additionalFields.includeDomains) {
-			const domains = (additionalFields.includeDomains as string)
-				.split(',')
-				.map((d) => d.trim())
-				.filter((d) => d.length > 0);
-			if (domains.length > 0) {
-				sourcePolicy.include_domains = domains;
-			}
-		}
-
-		if (additionalFields.excludeDomains) {
-			const domains = (additionalFields.excludeDomains as string)
-				.split(',')
-				.map((d) => d.trim())
-				.filter((d) => d.length > 0);
-			if (domains.length > 0) {
-				sourcePolicy.exclude_domains = domains;
-			}
-		}
-
-		return Object.keys(sourcePolicy).length > 0 ? sourcePolicy : null;
-	}
-
-	private tryParseJSON(input: string): string | object {
+	} else if (outputSchemaType === 'json') {
+		const jsonSchemaString = executeFunctions.getNodeParameter('jsonSchema', itemIndex) as string;
 		try {
-			return JSON.parse(input);
-		} catch {
-			return input;
-		}
-	}
-
-	private async parallelApiRequest(
-		this: IExecuteFunctions & Parallel,
-		method: IHttpRequestMethods,
-		endpoint: string,
-		body?: IDataObject,
-	): Promise<any> {
-		const options: IRequestOptions = {
-			method,
-			url: `https://api.parallel.ai${endpoint}`,
-			headers: {
-				'Content-Type': 'application/json',
-			},
-			json: true,
-		};
-
-		if (body) {
-			options.body = body;
-		}
-
-		try {
-			return await this.helpers.requestWithAuthentication.call(this, 'parallelApi', options);
+			const jsonSchema = JSON.parse(jsonSchemaString);
+			taskSpec.output_schema = {
+				type: 'json',
+				json_schema: jsonSchema,
+			};
 		} catch (error) {
-			throw new NodeOperationError(this.getNode(), error as JsonObject);
+			throw new NodeOperationError(
+				executeFunctions.getNode(),
+				`Invalid JSON in output schema: ${error.message}`,
+				{ itemIndex },
+			);
 		}
+	}
+
+	// Add input schema if provided
+	if (additionalFields.inputSchema) {
+		taskSpec.input_schema = additionalFields.inputSchema as string;
+	}
+
+	// Prepare request body
+	const body: IDataObject = {
+		input: tryParseJSON(input),
+		processor,
+		task_spec: taskSpec,
+	};
+
+	// Add metadata if provided
+	if (
+		additionalFields.metadata &&
+		Array.isArray((additionalFields.metadata as IDataObject).metadataFields)
+	) {
+		const metadata: IDataObject = {};
+		const metadataFields = (additionalFields.metadata as IDataObject)
+			.metadataFields as IDataObject[];
+		for (const field of metadataFields) {
+			if (field.key && field.value) {
+				metadata[field.key as string] = field.value;
+			}
+		}
+		if (Object.keys(metadata).length > 0) {
+			body.metadata = metadata;
+		}
+	}
+
+	// Add source policy if provided
+	const sourcePolicy = buildSourcePolicy(additionalFields);
+	if (sourcePolicy) {
+		body.source_policy = sourcePolicy;
+	}
+
+	// Create task run
+	const taskRun = await parallelApiRequest(executeFunctions, 'POST', '/v1/tasks/runs', body);
+	const runId = taskRun.run_id;
+
+	// Poll for result with increasing timeout and retry logic
+	const maxAttempts = 8; // More than 7 to get over an hour total
+	let attempt = 0;
+
+	while (attempt < maxAttempts) {
+		try {
+			const timeout = 570;
+			const result = await parallelApiRequest(
+				executeFunctions,
+				'GET',
+				`/v1/tasks/runs/${runId}/result?timeout=${timeout}`,
+			);
+
+			// Flatten the result for easier use in n8n
+			return getFlatResult(result);
+		} catch (error) {
+			attempt++;
+
+			// If it's a timeout error and we haven't exceeded max attempts, continue
+			if (error.httpCode === '408' && attempt < maxAttempts) {
+				continue;
+			}
+
+			// For other errors or if we've exceeded max attempts, throw
+			throw error;
+		}
+	}
+
+	throw new NodeOperationError(
+		executeFunctions.getNode(),
+		`Task execution timed out after ${maxAttempts} attempts (approximately ${maxAttempts * 10} minutes)`,
+		{ itemIndex },
+	);
+}
+
+async function executeSearch(
+	executeFunctions: IExecuteFunctions,
+	itemIndex: number,
+): Promise<IDataObject> {
+	const objective = executeFunctions.getNodeParameter('objective', itemIndex) as string;
+	const processor = executeFunctions.getNodeParameter('searchProcessor', itemIndex) as string;
+	const additionalFields = executeFunctions.getNodeParameter(
+		'searchAdditionalFields',
+		itemIndex,
+		{},
+	) as IDataObject;
+
+	// Prepare request body
+	const body: IDataObject = {
+		objective,
+		processor,
+	};
+
+	// Add search queries if provided
+	if (additionalFields.searchQueries) {
+		const queries = (additionalFields.searchQueries as string)
+			.split(',')
+			.map((q) => q.trim())
+			.filter((q) => q.length > 0);
+		if (queries.length > 0) {
+			body.search_queries = queries;
+		}
+	}
+
+	// Add other optional fields
+	if (additionalFields.maxResults) {
+		body.max_results = additionalFields.maxResults;
+	}
+	if (additionalFields.maxCharsPerResult) {
+		body.max_chars_per_result = additionalFields.maxCharsPerResult;
+	}
+
+	// Add source policy if provided
+	const sourcePolicy = buildSourcePolicy(additionalFields);
+	if (sourcePolicy) {
+		body.source_policy = sourcePolicy;
+	}
+
+	return await parallelApiRequest(executeFunctions, 'POST', '/v1beta/search', body);
+}
+
+function buildSourcePolicy(additionalFields: IDataObject): IDataObject | null {
+	const sourcePolicy: IDataObject = {};
+
+	if (additionalFields.includeDomains) {
+		const domains = (additionalFields.includeDomains as string)
+			.split(',')
+			.map((d) => d.trim())
+			.filter((d) => d.length > 0);
+		if (domains.length > 0) {
+			sourcePolicy.include_domains = domains;
+		}
+	}
+
+	if (additionalFields.excludeDomains) {
+		const domains = (additionalFields.excludeDomains as string)
+			.split(',')
+			.map((d) => d.trim())
+			.filter((d) => d.length > 0);
+		if (domains.length > 0) {
+			sourcePolicy.exclude_domains = domains;
+		}
+	}
+
+	return Object.keys(sourcePolicy).length > 0 ? sourcePolicy : null;
+}
+
+function tryParseJSON(input: string): string | object {
+	try {
+		return JSON.parse(input);
+	} catch {
+		return input;
+	}
+}
+
+async function parallelApiRequest(
+	executeFunctions: IExecuteFunctions,
+	method: IHttpRequestMethods,
+	endpoint: string,
+	body?: IDataObject,
+): Promise<any> {
+	const options: IRequestOptions = {
+		method,
+		url: `https://api.parallel.ai${endpoint}`,
+		headers: {
+			'Content-Type': 'application/json',
+		},
+		json: true,
+	};
+
+	if (body) {
+		options.body = body;
+	}
+
+	try {
+		return await executeFunctions.helpers.requestWithAuthentication.call(
+			executeFunctions,
+			'parallelApi',
+			options,
+		);
+	} catch (error) {
+		throw new NodeOperationError(executeFunctions.getNode(), error as JsonObject);
 	}
 }

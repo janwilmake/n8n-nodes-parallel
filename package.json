@@ -11,7 +11,7 @@
 		"data-extraction"
 	],
 	"license": "MIT",
-	"homepage": "https://github.com/your-username/n8n-nodes-parallel",
+	"homepage": "https://github.com/janwilmake/n8n-nodes-parallel",
 	"author": {
 		"name": "Jan Wilmake",
 		"email": "jan@wilmake.com"
