@@ -8,8 +8,8 @@
   - Test long-running tasks (ultra)
   - Test auto deep research
   - Test with custom JSON schema
-- Get access to publish package
-- Publish package `n8n-nodes-parallel`
+- Get access to publish package or transfer to there
+- Publish package `n8n-nodes-parallel` on parallels account or my own (can later move it easily)
 - Test in hosted environment
   - long running tasks work?
   - everything smooth
@@ -21,7 +21,8 @@
 - Submit community node and get vetted / make it official with n8n
 - Create blogpost / thread about n8n integration?
 - Popularize the integration
-  - with n8n influencers: work with M., J. to deploy it into the community?
+  - with n8n influencers: work with M & J to deploy it into the community by having them make great demos
+  - meeting M.
   - get it featured by n8n
 
 # Potential areas of improvement
