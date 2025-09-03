@@ -1,4 +1,4 @@
-# Creation of initial MVP (2025-09-02)
+# Creation of initial MVP (2025-09-02, 2025-09-03)
 
 - ✅ Make n8n node https://docs.n8n.io/integrations/creating-nodes/deploy/submit-community-nodes/
 - ✅ Initial draft spec: https://letmeprompt.com/rules-httpsuithu-wwlvvv0
@@ -12,25 +12,27 @@
   - ✅ https://docs.n8n.io/integrations/creating-nodes/deploy/submit-community-nodes
   - ✅ Make sure the linter passes (in other words, make sure running `npx @n8n/scan-community-package n8n-nodes-parallel` passes).
 - ✅ Create much better README that links to relevant playground and docs
-
-# Meeting
-
-- Transfer repo+package to `parallel-web` / `parallel-developers`?
-- Won't omitting 'task' from copy be confusing regarding docs? n8n ux guidelines ask using same terminology as platform
-- Source policy is found under 'additional fields' to keep initial form simple (good UX)
-- Note: Although provided, link to docs doesn't appear anywhere, but should be solved after approval
-- Discuss `parallel-flatten` (maybe make this configurable)
+- ✅ Source policy is found under 'additional fields' to keep initial form simple (good UX)
+- ✅ Note: Although provided, link to docs doesn't appear anywhere, but should be solved after approval
 
 # Testing and submission
 
 - Test locally
-  - Test long-running tasks (ultra++). If timeout is limited at 5 minutes, can we still set up the node to retry on failure, so that the result blocknig call is retried as many times as needed for task completion? Or let users know to do this? If not, let's potentially limit the UX only to the lower latency processors here (up to core for task api)
+  - ✅ text
+  - ✅ base
+  - ❌ pro (sometimes works, sometimes times out)
+  - ❌ can we still set up the node to retry on failure, so that the result blocknig call is retried as many times as needed for task completion? **No, this will create a new task**
+  - ✅ Test `search` with both options
   - Test `auto` deep research
   - Test `json` with JSON schema for output
-  - Test with users familiar with n8n
+- Wait for copy from Khushi and improve
 - Get access to publish package and transfer to `parallel-developers`
 - Get `parallel-web/n8n-nodes-parallel` created
 - Submit: https://docs.n8n.io/integrations/creating-nodes/deploy/submit-community-nodes (Support@parallel.ai + Parallel Web Systems as author)
+
+Where is most usage: self-hosted
+
+Does subworkflow pattern with a trigger from a webhook make sense, is it used a lot in this way where
 
 # After approval: early access testing
 
@@ -49,23 +51,27 @@ Iterate on README and info on fields.
 Think about outsourcing this to n8n dev agency or someone with big network in n8n community
 
 - Create blogpost / thread about n8n integration?
-- with n8n influencers: work with people deep in the n8n community
-- meeting Maurice
+- With n8n influencers: work with people deep in the n8n community
+- Meeting Maurice
 - Get it featured by n8n
-- making templates and blogs
-- search for n8n folks getting lot of traction
+- Making templates and blogs
+- Search for n8n folks getting lot of traction
 
 # Potential areas of improvement
+
+## Use setup with task creation + webhook
+
+This is difficult because you first need to enter the webhook URL for the trigger, ending up with lots of room for error. But it may be the only way for longer running tasks. May be a good thing to work on if people request it.
 
 ## How to reduce TTFI (time to first integration)
 
 - oauth
-- simplify i/o
+- simplify I/O
 - move points people could get confused to additional fields
 
-## to MCP or not to MCP?
+## To MCP or not to MCP?
 
-- MCP tools are potentially very powerful, but hard to really setup within n8n. Not allowing MCPs reduces capability of our product, but there's too much friction to add it and no easy way to test, likely resulting in frustration with low-coders
+- MCP tools are potentially very powerful, but hard to really setup within n8n. Not allowing MCPs reduces capability of our product, but there's too much friction to add it and no easy way to test, likely resulting in frustration with low-coders.
 
 ## Chat completions
 

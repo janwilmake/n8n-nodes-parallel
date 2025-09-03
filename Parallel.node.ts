@@ -9,7 +9,6 @@ import type {
 	JsonObject,
 } from 'n8n-workflow';
 import { NodeConnectionType, NodeOperationError } from 'n8n-workflow';
-import { getFlatResult } from './ParallelHelpers';
 
 export class Parallel implements INodeType {
 	description: INodeTypeDescription = {
@@ -96,7 +95,7 @@ export class Parallel implements INodeType {
 						description: 'Structured JSON schema',
 					},
 				],
-				default: 'auto',
+				default: 'text',
 			},
 			{
 				displayName: 'Output Description',
@@ -135,8 +134,8 @@ export class Parallel implements INodeType {
 				displayName: 'Processor',
 				name: 'processor',
 				type: 'options',
-				description:
-					'Processor used for the task. When choosing pro or above, ensure your workflow timeout is sufficient. Ultra tasks may take up to 30 minutes.',
+				// When choosing pro or above, ensure your workflow timeout is sufficient. Ultra tasks may take up to 30 minutes.
+				description: 'Processor used for the task.',
 				displayOptions: {
 					show: {
 						operation: ['webEnrichment'],
@@ -158,31 +157,32 @@ export class Parallel implements INodeType {
 						value: 'core',
 						description: 'Cross-referenced, moderately complex outputs - $25/1000 runs',
 					},
-					{
-						name: 'Pro',
-						value: 'pro',
-						description: 'Exploratory web research - $100/1000 runs',
-					},
-					{
-						name: 'Ultra',
-						value: 'ultra',
-						description: 'Advanced multi-source deep research - $300/1000 runs',
-					},
-					{
-						name: 'Ultra 2x',
-						value: 'ultra2x',
-						description: 'Difficult deep research - $600/1000 runs',
-					},
-					{
-						name: 'Ultra 4x',
-						value: 'ultra4x',
-						description: 'Very difficult deep research - $1200/1000 runs',
-					},
-					{
-						name: 'Ultra 8x',
-						value: 'ultra8x',
-						description: 'The most difficult deep research - $2400/1000 runs',
-					},
+					// These processors will time out in regular nodes. Should work on self-hosted ones though, but this is an edge case and we don't want to confuse people.
+					// {
+					// 	name: 'Pro',
+					// 	value: 'pro',
+					// 	description: 'Exploratory web research - $100/1000 runs',
+					// },
+					// {
+					// 	name: 'Ultra',
+					// 	value: 'ultra',
+					// 	description: 'Advanced multi-source deep research - $300/1000 runs',
+					// },
+					// {
+					// 	name: 'Ultra 2x',
+					// 	value: 'ultra2x',
+					// 	description: 'Difficult deep research - $600/1000 runs',
+					// },
+					// {
+					// 	name: 'Ultra 4x',
+					// 	value: 'ultra4x',
+					// 	description: 'Very difficult deep research - $1200/1000 runs',
+					// },
+					// {
+					// 	name: 'Ultra 8x',
+					// 	value: 'ultra8x',
+					// 	description: 'The most difficult deep research - $2400/1000 runs',
+					// },
 				],
 				default: 'base',
 			},
@@ -365,6 +365,7 @@ export class Parallel implements INodeType {
 			try {
 				if (operation === 'webEnrichment') {
 					const result = await executeTask(this, i);
+
 					returnData.push(result);
 				} else if (operation === 'webSearch') {
 					const result = await executeSearch(this, i);
@@ -480,20 +481,19 @@ async function executeTask(
 	const runId = taskRun.run_id;
 
 	// Poll for result with increasing timeout and retry logic
-	const maxAttempts = 8; // More than 7 to get over an hour total
+	const maxAttempts = 15;
 	let attempt = 0;
 
 	while (attempt < maxAttempts) {
 		try {
-			const timeout = 570;
+			const timeout = 240;
 			const result = await parallelApiRequest(
 				executeFunctions,
 				'GET',
 				`/v1/tasks/runs/${runId}/result?timeout=${timeout}`,
 			);
 
-			// Flatten the result for easier use in n8n
-			return getFlatResult(result);
+			return result;
 		} catch (error) {
 			attempt++;
 
@@ -509,7 +509,7 @@ async function executeTask(
 
 	throw new NodeOperationError(
 		executeFunctions.getNode(),
-		`Task execution timed out after ${maxAttempts} attempts (approximately ${maxAttempts * 10} minutes)`,
+		`Task execution timed out after ${maxAttempts} attempts (approximately ${maxAttempts * 4} minutes)`,
 		{ itemIndex },
 	);
 }
