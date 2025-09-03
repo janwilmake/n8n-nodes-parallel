@@ -19,6 +19,7 @@
 - Won't omitting 'task' from copy be confusing regarding docs? n8n ux guidelines ask using same terminology as platform
 - Source policy is found under 'additional fields' to keep initial form simple (good UX)
 - Note: Although provided, link to docs doesn't appear anywhere, but should be solved after approval
+- Discuss `parallel-flatten` (maybe make this configurable)
 
 # Testing and submission
 
@@ -74,7 +75,6 @@ Add `/chat/completions` with text output.
 
 - Auto mode likely isn't preferable here since we are flattening the output and auto-mode creates deeply nested result
 - Idea: link to playground for creating output schema and recommended processor using ingest API
-- Ensure link to docs are working. If not, find best ways to do it.
 
 ## Avoiding Timeout
 
