@@ -5,15 +5,16 @@
 - ✅ Test this node within the n8n interface and see if it works as expected
   - ✅ Timeout: added description to processor parameter
   - ✅ Improve form for `outputSchema`
+- ✅ Copy change for the APIs -- "Web Enrichment" for Task API and "Web Search" for Search API
+- ✅ Publish package `n8n-nodes-parallel`
+- Test in hosted environment
   - Test long-running tasks (ultra)
+    - If timeout is limited at 5 minutes, can we still set up the node to retry on failure, so that the result blocknig call is retried as many times as needed for task completion? Or let users know to do this? If not, let's potentially limit the UX only to the lower latency processors here (up to core for task api)
   - Test auto deep research
   - Test with custom JSON schema
+  - Long running tasks work?
+  - Test with users familiar with n8n
 - Get access to publish package or transfer to there
-- Publish package `n8n-nodes-parallel` on parallels account or my own (can later move it easily)
-- Test in hosted environment
-  - long running tasks work?
-  - everything smooth
-  - test with users familiar with n8n
 - Confirm everything is according to guidelines
   - https://docs.n8n.io/integrations/creating-nodes/build/reference/verification-guidelines/
   - https://docs.n8n.io/integrations/creating-nodes/deploy/submit-community-nodes
@@ -24,6 +25,13 @@
   - with n8n influencers: work with M & J to deploy it into the community by having them make great demos
   - meeting M.
   - get it featured by n8n
+
+# Meeting
+
+- transfer repo+package to `parallel-web` / `parallel-developers`?
+- won't omitting 'task' from copy be confusing regarding docs? n8n ux guidelines ask using same terminology as platform
+- Although provided, link to docs doesn't appear anywhere.
+- source policy is found under 'additional fields' to keep initial form simple (good uxx)
 
 # Potential areas of improvement
 
@@ -61,3 +69,5 @@ If the timeout is just up to 5 minutes, only the "lite", "base", and "core" proc
 Example authentication via oauth2: https://github.com/n8n-io/n8n/blob/master/packages/nodes-base/credentials/BoxOAuth2Api.credentials.ts.
 
 Authentication via oauth is may significantly reduce churn, especially for people that don't have an account with Parallel yet. [Deep research that confirms this](https://claude.ai/public/artifacts/52c28da0-85b2-4fc8-9ca9-712cf949cbbb)
+
+N8n UX guidelines recommend using oauth if available: https://docs.n8n.io/integrations/creating-nodes/build/reference/ux-guidelines/#oauth

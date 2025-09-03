@@ -18,8 +18,8 @@ export class Parallel implements INodeType {
 		icon: 'file:parallel.svg',
 		group: ['transform'],
 		version: 1,
-		subtitle: '={{$parameter["operation"] + ": " + $parameter["resource"]}}',
-		description: 'AI-powered research and data extraction using Parallel',
+		subtitle: '={{$parameter["operation"]}}',
+		description: 'Web Actions - Web Enrichment and Web Search powered by AI',
 		defaults: {
 			name: 'Parallel',
 		},
@@ -33,74 +33,36 @@ export class Parallel implements INodeType {
 		],
 		properties: [
 			{
-				displayName: 'Resource',
-				name: 'resource',
-				type: 'options',
-				noDataExpression: true,
-				options: [
-					{
-						name: 'Task',
-						value: 'task',
-					},
-					{
-						name: 'Search',
-						value: 'search',
-					},
-				],
-				default: 'task',
-			},
-			// TASK OPERATIONS
-			{
 				displayName: 'Operation',
 				name: 'operation',
 				type: 'options',
 				noDataExpression: true,
-				displayOptions: {
-					show: {
-						resource: ['task'],
-					},
-				},
 				options: [
 					{
-						name: 'Execute',
-						value: 'execute',
-						description: 'Execute a task and wait for completion',
-						action: 'Execute a task',
+						name: 'Web Enrichment',
+						value: 'webEnrichment',
+						description: 'Execute a task with AI-powered web research and data extraction',
+						action: 'Web Enrichment',
 					},
-				],
-				default: 'execute',
-			},
-			// SEARCH OPERATIONS
-			{
-				displayName: 'Operation',
-				name: 'operation',
-				type: 'options',
-				noDataExpression: true,
-				displayOptions: {
-					show: {
-						resource: ['search'],
-					},
-				},
-				options: [
 					{
-						name: 'Search',
-						value: 'search',
-						description: 'Search the web',
-						action: 'Search the web',
+						name: 'Web Search',
+						value: 'webSearch',
+						description: 'Search the web with AI-powered processing',
+						action: 'Web Search',
 					},
 				],
-				default: 'search',
+				default: 'webEnrichment',
 			},
-			// TASK FIELDS
+			// WEB ENRICHMENT FIELDS
 			{
 				displayName: 'Input',
 				name: 'input',
+				// there is no such thing as textarea
 				type: 'string',
 				required: true,
 				displayOptions: {
 					show: {
-						resource: ['task'],
-						operation: ['execute'],
+						operation: ['webEnrichment'],
 					},
 				},
 				default: '',
@@ -114,8 +76,7 @@ export class Parallel implements INodeType {
 				required: true,
 				displayOptions: {
 					show: {
-						resource: ['task'],
-						operation: ['execute'],
+						operation: ['webEnrichment'],
 					},
 				},
 				options: [
@@ -135,7 +96,7 @@ export class Parallel implements INodeType {
 						description: 'Structured JSON schema',
 					},
 				],
-				default: 'text',
+				default: 'auto',
 			},
 			{
 				displayName: 'Output Description',
@@ -144,8 +105,7 @@ export class Parallel implements INodeType {
 				required: true,
 				displayOptions: {
 					show: {
-						resource: ['task'],
-						operation: ['execute'],
+						operation: ['webEnrichment'],
 						outputSchemaType: ['text'],
 					},
 				},
@@ -163,8 +123,7 @@ export class Parallel implements INodeType {
 				required: true,
 				displayOptions: {
 					show: {
-						resource: ['task'],
-						operation: ['execute'],
+						operation: ['webEnrichment'],
 						outputSchemaType: ['json'],
 					},
 				},
@@ -180,8 +139,7 @@ export class Parallel implements INodeType {
 					'Processor used for the task. When choosing pro or above, ensure your workflow timeout is sufficient. Ultra tasks may take up to 30 minutes.',
 				displayOptions: {
 					show: {
-						resource: ['task'],
-						operation: ['execute'],
+						operation: ['webEnrichment'],
 					},
 				},
 				options: [
@@ -235,12 +193,27 @@ export class Parallel implements INodeType {
 				placeholder: 'Add Field',
 				displayOptions: {
 					show: {
-						resource: ['task'],
-						operation: ['execute'],
+						operation: ['webEnrichment'],
 					},
 				},
 				default: {},
 				options: [
+					{
+						displayName: 'Include Domains',
+						name: 'includeDomains',
+						type: 'string',
+						default: '',
+						placeholder: 'wikipedia.org,reuters.com',
+						description: 'Comma-separated list of domains to include in search results',
+					},
+					{
+						displayName: 'Exclude Domains',
+						name: 'excludeDomains',
+						type: 'string',
+						default: '',
+						placeholder: 'reddit.com,x.com',
+						description: 'Comma-separated list of domains to exclude from search results',
+					},
 					{
 						displayName: 'Input Schema',
 						name: 'inputSchema',
@@ -278,25 +251,9 @@ export class Parallel implements INodeType {
 						],
 						description: 'Custom metadata to store with the run',
 					},
-					{
-						displayName: 'Include Domains',
-						name: 'includeDomains',
-						type: 'string',
-						default: '',
-						placeholder: 'wikipedia.org,reuters.com',
-						description: 'Comma-separated list of domains to include in search results',
-					},
-					{
-						displayName: 'Exclude Domains',
-						name: 'excludeDomains',
-						type: 'string',
-						default: '',
-						placeholder: 'reddit.com,x.com',
-						description: 'Comma-separated list of domains to exclude from search results',
-					},
 				],
 			},
-			// SEARCH FIELDS
+			// WEB SEARCH FIELDS
 			{
 				displayName: 'Objective',
 				name: 'objective',
@@ -304,8 +261,7 @@ export class Parallel implements INodeType {
 				required: false,
 				displayOptions: {
 					show: {
-						resource: ['search'],
-						operation: ['search'],
+						operation: ['webSearch'],
 					},
 				},
 				default: '',
@@ -318,8 +274,7 @@ export class Parallel implements INodeType {
 				type: 'options',
 				displayOptions: {
 					show: {
-						resource: ['search'],
-						operation: ['search'],
+						operation: ['webSearch'],
 					},
 				},
 				options: [
@@ -343,20 +298,28 @@ export class Parallel implements INodeType {
 				placeholder: 'Add Field',
 				displayOptions: {
 					show: {
-						resource: ['search'],
-						operation: ['search'],
+						operation: ['webSearch'],
 					},
 				},
 				default: {},
 				options: [
 					{
-						displayName: 'Search Queries',
-						name: 'searchQueries',
+						displayName: 'Include Domains',
+						name: 'includeDomains',
 						type: 'string',
 						default: '',
-						placeholder: 'artificial intelligence, machine learning, AI news',
-						description: 'Comma-separated list of traditional keyword search queries',
+						placeholder: 'wikipedia.org,reuters.com',
+						description: 'Comma-separated list of domains to include in search results',
 					},
+					{
+						displayName: 'Exclude Domains',
+						name: 'excludeDomains',
+						type: 'string',
+						default: '',
+						placeholder: 'reddit.com,x.com',
+						description: 'Comma-separated list of domains to exclude from search results',
+					},
+
 					{
 						displayName: 'Max Results',
 						name: 'maxResults',
@@ -379,21 +342,14 @@ export class Parallel implements INodeType {
 						default: 1000,
 						description: 'Maximum number of characters to include in excerpts for each result',
 					},
+
 					{
-						displayName: 'Include Domains',
-						name: 'includeDomains',
+						displayName: 'Search Queries',
+						name: 'searchQueries',
 						type: 'string',
 						default: '',
-						placeholder: 'wikipedia.org,reuters.com',
-						description: 'Comma-separated list of domains to include in search results',
-					},
-					{
-						displayName: 'Exclude Domains',
-						name: 'excludeDomains',
-						type: 'string',
-						default: '',
-						placeholder: 'reddit.com,x.com',
-						description: 'Comma-separated list of domains to exclude from search results',
+						placeholder: 'artificial intelligence, machine learning, AI news',
+						description: 'Comma-separated list of traditional keyword search queries',
 					},
 				],
 			},
@@ -403,21 +359,16 @@ export class Parallel implements INodeType {
 	async execute(this: IExecuteFunctions): Promise<INodeExecutionData[][]> {
 		const items = this.getInputData();
 		const returnData: IDataObject[] = [];
-		const resource = this.getNodeParameter('resource', 0) as string;
 		const operation = this.getNodeParameter('operation', 0) as string;
 
 		for (let i = 0; i < items.length; i++) {
 			try {
-				if (resource === 'task') {
-					if (operation === 'execute') {
-						const result = await executeTask(this, i);
-						returnData.push(result);
-					}
-				} else if (resource === 'search') {
-					if (operation === 'search') {
-						const result = await executeSearch(this, i);
-						returnData.push(result);
-					}
+				if (operation === 'webEnrichment') {
+					const result = await executeTask(this, i);
+					returnData.push(result);
+				} else if (operation === 'webSearch') {
+					const result = await executeSearch(this, i);
+					returnData.push(result);
 				}
 			} catch (error) {
 				if (this.continueOnFail()) {

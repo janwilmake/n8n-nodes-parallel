@@ -6,6 +6,7 @@
 	"resources": {
 		"credentialDocumentation": [{ "url": "https://docs.parallel.ai/" }],
 		"primaryDocumentation": [{ "url": "https://docs.parallel.ai/" }],
+
 		"generic": [
 			{
 				"label": "AI-Powered Research and Data Extraction with Parallel",
