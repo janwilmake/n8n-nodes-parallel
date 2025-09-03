@@ -40,7 +40,7 @@ Intelligent web search with AI-powered processing:
 ### **Flexible Output Schemas**
 
 - **Auto**: Let AI determine the best output structure
-- **Text**: Natural language descriptions of desired outputs
+- **Text**: Single text output field with evidence
 - **JSON**: [Custom structured schemas](https://docs.parallel.ai/task-api/core-concepts/specify-a-task.md) for precise data extraction
 
 ### **Research Quality & Transparency**
