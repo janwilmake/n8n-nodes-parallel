@@ -60,7 +60,7 @@ Think about outsourcing this to n8n dev agency or someone with big network in n8
 
 - oauth
 - simplify i/o
-- remove points people could get confused
+- move points people could get confused to additional fields
 
 ## to MCP or not to MCP?
 
