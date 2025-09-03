@@ -34,7 +34,9 @@
 # After approval: early access testing
 
 > See: https://docs.n8n.io/hosting/ and https://docs.n8n.io/integrations/community-nodes/installation/gui-install/.
-> seems I need to either self-host or get approved first
+>
+> Seems I need to either self-host or get approved first
+>
 > People COULD already use it locally or on self-hosted before approval
 
 Test with people who wanted early access.
