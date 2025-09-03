@@ -1,4 +1,4 @@
-# TODO
+# Creation of initial MVP (2025-09-02)
 
 - ✅ Make n8n node https://docs.n8n.io/integrations/creating-nodes/deploy/submit-community-nodes/
 - ✅ Initial draft spec: https://letmeprompt.com/rules-httpsuithu-wwlvvv0
@@ -11,14 +11,35 @@
   - ✅ https://docs.n8n.io/integrations/creating-nodes/build/reference/verification-guidelines/
   - ✅ https://docs.n8n.io/integrations/creating-nodes/deploy/submit-community-nodes
   - ✅ Make sure the linter passes (in other words, make sure running `npx @n8n/scan-community-package n8n-nodes-parallel` passes).
+- ✅ Create much better README that links to relevant playground and docs
+
+# Meeting
+
+- Note: Although provided, link to docs doesn't appear anywhere, but should be solved after approval
+- Transfer repo+package to `parallel-web` / `parallel-developers`?
+- Won't omitting 'task' from copy be confusing regarding docs? n8n ux guidelines ask using same terminology as platform
+- Source policy is found under 'additional fields' to keep initial form simple (good UX)
+
+# Testing and submission
+
 - Test locally
   - Test long-running tasks (ultra++). If timeout is limited at 5 minutes, can we still set up the node to retry on failure, so that the result blocknig call is retried as many times as needed for task completion? Or let users know to do this? If not, let's potentially limit the UX only to the lower latency processors here (up to core for task api)
   - Test `auto` deep research
   - Test `json` with JSON schema for output
   - Test with users familiar with n8n
-- Submit: https://docs.n8n.io/integrations/creating-nodes/deploy/submit-community-nodes
 - Get access to publish package and transfer to `parallel-developers`
-- Test in hosted environment with early adopters (See: https://docs.n8n.io/hosting/ and https://docs.n8n.io/integrations/community-nodes/installation/gui-install/. seems I need to either self-host or get approved first)
+- Get `n8n-nodes-parallel`
+- Submit: https://docs.n8n.io/integrations/creating-nodes/deploy/submit-community-nodes (Support@parallel.ai + Parallel Web Systems as author)
+
+# After approval: early access testing
+
+> See: https://docs.n8n.io/hosting/ and https://docs.n8n.io/integrations/community-nodes/installation/gui-install/.
+> seems I need to either self-host or get approved first
+> People COULD already use it locally or on self-hosted before approval
+
+Test with people who wanted early access.
+
+Iterate on README and info on fields.
 
 # How to popularize the integration
 
@@ -30,13 +51,6 @@ Think about outsourcing this to n8n dev agency or someone with big network in n8
 - Get it featured by n8n
 - making templates and blogs
 - search for n8n folks getting lot of traction
-
-# Meeting
-
-- transfer repo+package to `parallel-web` / `parallel-developers`?
-- won't omitting 'task' from copy be confusing regarding docs? n8n ux guidelines ask using same terminology as platform
-- Although provided, link to docs doesn't appear anywhere.
-- source policy is found under 'additional fields' to keep initial form simple (good ux)
 
 # Potential areas of improvement
 
