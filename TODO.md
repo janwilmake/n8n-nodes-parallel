@@ -15,10 +15,10 @@
 
 # Meeting
 
-- Note: Although provided, link to docs doesn't appear anywhere, but should be solved after approval
 - Transfer repo+package to `parallel-web` / `parallel-developers`?
 - Won't omitting 'task' from copy be confusing regarding docs? n8n ux guidelines ask using same terminology as platform
 - Source policy is found under 'additional fields' to keep initial form simple (good UX)
+- Note: Although provided, link to docs doesn't appear anywhere, but should be solved after approval
 
 # Testing and submission
 
@@ -28,7 +28,7 @@
   - Test `json` with JSON schema for output
   - Test with users familiar with n8n
 - Get access to publish package and transfer to `parallel-developers`
-- Get `n8n-nodes-parallel`
+- Get `parallel-web/n8n-nodes-parallel` created
 - Submit: https://docs.n8n.io/integrations/creating-nodes/deploy/submit-community-nodes (Support@parallel.ai + Parallel Web Systems as author)
 
 # After approval: early access testing
