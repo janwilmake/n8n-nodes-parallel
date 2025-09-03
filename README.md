@@ -21,10 +21,7 @@ Turn any input into structured data through AI-powered web research:
 - **Content Research**: Article summaries, fact-checking, data validation
 - **Market Intelligence**: Industry trends, company updates, regulatory changes
 
-Choose from multiple [processor levels](https://docs.parallel.ai/task-api/core-concepts/choose-a-processor.md) based on complexity:
-
-- **Lite/Base/Core**: Quick lookups and standard enrichment
-- **Pro/Ultra variants**: Deep research requiring complex reasoning
+Choose from multiple [processor levels](https://docs.parallel.ai/task-api/core-concepts/choose-a-processor.md) based on complexity. For now, only **lite** and **base** are available.
 
 ### 🌐 **Web Search** - [Search API](https://docs.parallel.ai/search-api/search-quickstart.md)
 
@@ -39,9 +36,9 @@ Intelligent web search with AI-powered processing:
 
 ### **Flexible Output Schemas**
 
-- **Auto**: Let AI determine the best output structure
 - **Text**: Single text output field with evidence
 - **JSON**: [Custom structured schemas](https://docs.parallel.ai/task-api/core-concepts/specify-a-task.md) for precise data extraction
+- ~~Auto: (not available) Let AI determine the best output structure~~
 
 ### **Research Quality & Transparency**
 

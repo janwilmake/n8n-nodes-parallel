@@ -23,8 +23,8 @@
   - ❌ pro (sometimes works, sometimes times out)
   - ❌ can we still set up the node to retry on failure, so that the result blocknig call is retried as many times as needed for task completion? **No, this will create a new task**
   - ✅ Test `search` with both options
-  - Test `auto` deep research
-  - Test `json` with JSON schema for output
+  - ✅ Test `json` with JSON schema for output
+  - ✅ Test `auto` deep research. **Doesn't work with core and below**
 - Wait for copy from Khushi and improve
 - Get access to publish package and transfer to `parallel-developers`
 - Get `parallel-web/n8n-nodes-parallel` created

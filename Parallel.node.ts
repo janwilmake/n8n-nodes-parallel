@@ -79,11 +79,12 @@ export class Parallel implements INodeType {
 					},
 				},
 				options: [
-					{
-						name: 'Auto',
-						value: 'auto',
-						description: 'Automatically determine output schema',
-					},
+					// only for pro and above
+					// {
+					// 	name: 'Auto',
+					// 	value: 'auto',
+					// 	description: 'Automatically determine output schema',
+					// },
 					{
 						name: 'Text',
 						value: 'text',
@@ -152,11 +153,12 @@ export class Parallel implements INodeType {
 						value: 'base',
 						description: 'Reliable standard enrichments - $10/1000 runs',
 					},
-					{
-						name: 'Core',
-						value: 'core',
-						description: 'Cross-referenced, moderately complex outputs - $25/1000 runs',
-					},
+					// up to 5 minutes will still time out
+					// {
+					// 	name: 'Core',
+					// 	value: 'core',
+					// 	description: 'Cross-referenced, moderately complex outputs - $25/1000 runs',
+					// },
 					// These processors will time out in regular nodes. Should work on self-hosted ones though, but this is an edge case and we don't want to confuse people.
 					// {
 					// 	name: 'Pro',
