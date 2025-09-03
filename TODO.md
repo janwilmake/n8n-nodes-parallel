@@ -7,31 +7,36 @@
   - ✅ Improve form for `outputSchema`
 - ✅ Copy change for the APIs -- "Web Enrichment" for Task API and "Web Search" for Search API
 - ✅ Publish package `n8n-nodes-parallel`
-- Test in hosted environment
-  - Test long-running tasks (ultra)
-    - If timeout is limited at 5 minutes, can we still set up the node to retry on failure, so that the result blocknig call is retried as many times as needed for task completion? Or let users know to do this? If not, let's potentially limit the UX only to the lower latency processors here (up to core for task api)
-  - Test auto deep research
-  - Test with custom JSON schema
-  - Long running tasks work?
+- ✅ Confirm everything is according to guidelines
+  - ✅ https://docs.n8n.io/integrations/creating-nodes/build/reference/verification-guidelines/
+  - ✅ https://docs.n8n.io/integrations/creating-nodes/deploy/submit-community-nodes
+  - ✅ Make sure the linter passes (in other words, make sure running `npx @n8n/scan-community-package n8n-nodes-parallel` passes).
+- Test locally
+  - Test long-running tasks (ultra++). If timeout is limited at 5 minutes, can we still set up the node to retry on failure, so that the result blocknig call is retried as many times as needed for task completion? Or let users know to do this? If not, let's potentially limit the UX only to the lower latency processors here (up to core for task api)
+  - Test `auto` deep research
+  - Test `json` with JSON schema for output
   - Test with users familiar with n8n
-- Get access to publish package or transfer to there
-- Confirm everything is according to guidelines
-  - https://docs.n8n.io/integrations/creating-nodes/build/reference/verification-guidelines/
-  - https://docs.n8n.io/integrations/creating-nodes/deploy/submit-community-nodes
-  - Make sure the linter passes (in other words, make sure running npx @n8n/scan-community-package n8n-nodes-PACKAGE passes).
-- Submit community node and get vetted / make it official with n8n
+- Submit: https://docs.n8n.io/integrations/creating-nodes/deploy/submit-community-nodes
+- Get access to publish package and transfer to `parallel-developers`
+- Test in hosted environment with early adopters (See: https://docs.n8n.io/hosting/ and https://docs.n8n.io/integrations/community-nodes/installation/gui-install/. seems I need to either self-host or get approved first)
+
+# How to popularize the integration
+
+Think about outsourcing this to n8n dev agency or someone with big network in n8n community
+
 - Create blogpost / thread about n8n integration?
-- Popularize the integration
-  - with n8n influencers: work with M & J to deploy it into the community by having them make great demos
-  - meeting M.
-  - get it featured by n8n
+- with n8n influencers: work with people deep in the n8n community
+- meeting Maurice
+- Get it featured by n8n
+- making templates and blogs
+- search for n8n folks getting lot of traction
 
 # Meeting
 
 - transfer repo+package to `parallel-web` / `parallel-developers`?
 - won't omitting 'task' from copy be confusing regarding docs? n8n ux guidelines ask using same terminology as platform
 - Although provided, link to docs doesn't appear anywhere.
-- source policy is found under 'additional fields' to keep initial form simple (good uxx)
+- source policy is found under 'additional fields' to keep initial form simple (good ux)
 
 # Potential areas of improvement
 

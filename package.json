@@ -27,10 +27,11 @@
 	"scripts": {
 		"build": "npx rimraf dist && tsc && gulp build:icons",
 		"dev": "tsc --watch",
-		"format": "prettier nodes credentials --write",
-		"lint": "eslint nodes credentials package.json",
-		"lintfix": "eslint nodes credentials package.json --fix",
-		"prepublishOnly": "npm run build && npm run lint -c .eslintrc.prepublish.js nodes credentials package.json"
+		"format": "prettier --write",
+		"lint": "eslint package.json",
+		"lintfix": "eslint package.json --fix",
+		"prepublishOnly": "npm run build && npm run lint -c .eslintrc.prepublish.js package.json",
+		"scan-package": "npx @n8n/scan-community-package n8n-nodes-parallel"
 	},
 	"files": [
 		"dist"
